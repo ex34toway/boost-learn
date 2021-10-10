@@ -9,7 +9,7 @@
  .\b2.exe --with-thread --stagedir=".\stage_x64" address-model=64 runtime-link=static variant=debug
 ```
 
-### 项目编译
+## 项目编译
 
 ```cmd
 mkdir build

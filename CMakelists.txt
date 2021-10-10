@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 option(ENABLE_TEST "Build all tests." ON)
 
-find_package(Boost REQUIRED COMPONENTS thread)
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost REQUIRED COMPONENTS regex thread)
 
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -24,6 +25,10 @@ enable_testing()
 add_executable(signals2_test tests/signals2/signals2_test.cpp)
 target_link_libraries(signals2_test PRIVATE gtest_main)
 
+add_executable(asio_test tests/asio/asio_timer_test.cpp tests/asio/asio_udp_test.cpp tests/asio/asio_tcp_test.cpp)
+target_link_libraries(asio_test PRIVATE gtest_main ${Boost_LIBRARIES})
+
 include(GoogleTest)
 gtest_discover_tests(signals2_test)
+gtest_discover_tests(asio_test)
 endif()

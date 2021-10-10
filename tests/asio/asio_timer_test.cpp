@@ -96,3 +96,15 @@ TEST(asio, Timer)
         std::cout << "Exception: " << e.what() << "\n";
     }
 }
+
+TEST(asio, SyncTimer)
+{
+    boost::asio::io_context io;
+
+    boost::asio::steady_timer t(io, boost::asio::chrono::seconds(5));
+
+    t.wait();
+
+    std::cout << "after 5 seconds" << std::endl;
+}
+

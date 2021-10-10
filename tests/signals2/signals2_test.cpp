@@ -11,7 +11,7 @@ struct HelloWorld
 	}
 };
 
-TEST(Signals2, SingleSlot)
+TEST(signals2, SingleSlot)
 {
 	boost::signals2::signal<void()> sig;
 
@@ -38,7 +38,7 @@ struct World
 	}
 };
 
-TEST(Signals2, MultiSlot)
+TEST(signals2, MultiSlot)
 {
 	boost::signals2::signal<void()> sig;
 

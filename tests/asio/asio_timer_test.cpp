@@ -108,3 +108,16 @@ TEST(asio, SyncTimer)
     std::cout << "after 5 seconds" << std::endl;
 }
 
+
+TEST(asio, AsyncTimer)
+{
+    boost::asio::io_context io;
+
+    boost::asio::steady_timer t(io, boost::asio::chrono::seconds(5));
+
+    t.async_wait([] (boost::system::error_code ec) -> void {
+            std::cout << "after 5 seconds" << std::endl;
+        });
+
+    io.run();
+}

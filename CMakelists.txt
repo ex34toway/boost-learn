@@ -25,8 +25,14 @@ enable_testing()
 add_executable(signals2_test tests/signals2/signals2_test.cpp)
 target_link_libraries(signals2_test PRIVATE gtest_main)
 
-add_executable(asio_test tests/asio/asio_timer_test.cpp tests/asio/asio_udp_test.cpp tests/asio/asio_tcp_test.cpp)
+
+file(GLOB asio_test_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/asio/*.cpp)
+add_executable(asio_test ${asio_test_SRC})
 target_link_libraries(asio_test PRIVATE gtest_main ${Boost_LIBRARIES})
+
+file(GLOB std_test_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/std/*.cpp)
+add_executable(std_test ${std_test_SRC})
+target_link_libraries(std_test PRIVATE gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(signals2_test)

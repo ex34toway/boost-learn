@@ -223,3 +223,91 @@ TEST(asio, Allocator)
     server s(io_service, 8080);
     io_service.run();
 }
+
+
+class shared_const_buffer
+{
+public:
+    // Construct from a std::string.
+    explicit shared_const_buffer(const std::string& data)
+        : data_(new std::vector<char>(data.begin(), data.end())),
+        buffer_(boost::asio::buffer(*data_))
+    {
+    }
+
+    // Implement the ConstBufferSequence requirements.
+    typedef boost::asio::const_buffer value_type;
+    typedef const boost::asio::const_buffer* const_iterator;
+    const const_iterator begin() const { return &buffer_; }
+    const const_iterator end() const { return &buffer_ + 1; }
+
+private:
+    std::shared_ptr<std::vector<char> > data_;
+    boost::asio::const_buffer buffer_;
+};
+
+
+TEST(asio, Buffer)
+{
+    class session
+        : public std::enable_shared_from_this<session>
+    {
+    public:
+        session(boost::asio::ip::tcp::socket socket)
+            : socket_(std::move(socket))
+        {
+        }
+
+        void start()
+        {
+            do_write();
+        }
+
+    private:
+        void do_write()
+        {
+            std::time_t now = std::time(0);
+            shared_const_buffer buffer(std::ctime(&now));
+
+            auto self(shared_from_this());
+            boost::asio::async_write(socket_, buffer,
+                [self](boost::system::error_code /*ec*/, std::size_t /*length*/)
+                {
+                });
+        }
+
+        boost::asio::ip::tcp::socket socket_;
+    };
+
+    class server
+    {
+    public:
+        server(boost::asio::io_context& io_context, short port)
+            : acceptor_(io_context, 
+                boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+        {
+            do_accept();
+        }
+
+    private:
+        void do_accept()
+        {
+            acceptor_.async_accept(
+                [this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket)
+                {
+                    if (!ec)
+                    {
+                        std::make_shared<session>(std::move(socket))->start();
+                    }
+
+                    do_accept();
+                });
+        }
+
+        boost::asio::ip::tcp::acceptor acceptor_;
+    };
+
+    boost::asio::io_service io_service;
+    server s(io_service, 8080);
+    io_service.run();
+}
